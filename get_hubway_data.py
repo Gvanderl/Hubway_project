@@ -35,7 +35,8 @@ def is_ms(start_date, end_date, duration):
 # Get the input file
 while True:
     if local_path is None:
-        local_path = input("Path of the csv : ")
+        local_path = input("Path of the csv (-1 to exit): ")
+        if local_path == 1: sys.exit()
     if not local_path.endswith(".csv"):
         local_path += ".csv"
     try:
@@ -50,10 +51,11 @@ while True:
 # Get the output directory
 while True:
     if output_dir is None:
-        output_dir = input("Output directory : ")
+        output_dir = input("Output directory (-1 to exit): ")
+        if output_dir == 1: sys.exit()
     if not os.path.isdir(output_dir):
         print("This is not a valid output directory")
-        local_path = None
+        output_dir = None
         continue
     break
 
