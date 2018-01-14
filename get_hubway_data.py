@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import json
 import sys
 
+# Gets data passed in command line
 local_path, output_dir = None, None
 for index, word in enumerate(sys.argv):
     if word == "--input":
@@ -11,11 +12,10 @@ for index, word in enumerate(sys.argv):
     if word == "--output":
         output_dir = sys.argv[index + 1]
 
-# These have been constant through all of Hubway"s CSVs (the column headers are not)
+# These have been constant through all of Hubway"s CSVs (their column headers are not)
 DURATION_COLUMN = 0
 START_DATE_COLUMN = 1
 END_DATE_COLUMN = 2
-BIKE_ID_COLUMN = 7
 
 
 # Some of Hubway"s CSVs durations are in ms
@@ -59,35 +59,48 @@ while True:
         continue
     break
 
-# We clean the data set
+# Cleans the data set
 df.columns = [x.lower() for x in df.columns]
 df = df.dropna(axis=1)
+
+# Finds the columns for relevant data
+bike_ID_column, start_station_column, end_station_column = None, None, None
+for index, header in enumerate(list(df.columns.values)):
+    if "bike" in header:
+        bike_ID_column = index
+    if "start station name" in header:
+        start_station_column = index
+    if "end station name" in header:
+        end_station_column = index
+if (bike_ID_column is None) or (start_station_column is None) or (end_station_column is None):
+    print("Could not find relevant columns")
+    sys.exit(1)
 
 # Some data sets have duration in milliseconds, it is converted to seconds
 if is_ms(df.iloc[0, START_DATE_COLUMN], df.iloc[0, END_DATE_COLUMN], df.iloc[0, DURATION_COLUMN]):
     df.iloc[:, DURATION_COLUMN] = df.iloc[:, DURATION_COLUMN].apply(lambda x: float(x)/1000)
 # Some data sets have a letter at the start of the the bike ID, it is deleted
-if str(df.iloc[0, BIKE_ID_COLUMN])[0].isalpha():
-    df.iloc[:, BIKE_ID_COLUMN] = df.iloc[:, BIKE_ID_COLUMN].apply(lambda x: int(x[1:]) if str(x[1:]).isdigit() else None)
+if str(df.iloc[0, bike_ID_column])[0].isalpha():
+    df.iloc[:, bike_ID_column] = df.iloc[:, bike_ID_column].apply(lambda x: int(x[1:]) if str(x[1:]).isdigit() else None)
 df = df.dropna()
 
 # Extract the relevant data (Note: Duration data heavily right-skewed, might be better to use the median)
 data = {"Earliest date": str(df.iloc[:, START_DATE_COLUMN].min()),
         "Latest date": str(df.iloc[:, END_DATE_COLUMN].max()),
-        "Station most traveled from": df["start station name"].value_counts().index[0],
-        "Station most traveled to": df["end station name"].value_counts().index[0],
+        "Station most traveled from": df.iloc[:, start_station_column].value_counts().index[0],
+        "Station most traveled to": df.iloc[:, end_station_column].value_counts().index[0],
         "Average duration (sec)": (df.iloc[:, DURATION_COLUMN].mean())}
 data["Average duration for the most common trip (sec)"] = \
-    (df.where((df["start station name"] == data["Station most traveled from"]) &
-              (df["end station name"] == data["Station most traveled to"]))).iloc[:, DURATION_COLUMN].mean()
+    (df.where((df.iloc[:, start_station_column] == data["Station most traveled from"]) &
+              (df.iloc[:, end_station_column] == data["Station most traveled to"]))).iloc[:, DURATION_COLUMN].mean()
 
-# Creates the histogram
+# Creates the histogram for the bike IDs
 ax = plt.subplot(111)
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 plt.grid(color="gray",
          alpha=.2)
-plt.hist(df.iloc[:, BIKE_ID_COLUMN],
+plt.hist(df.iloc[:, bike_ID_column],
          alpha=1,
          color="royalblue",
          bins='auto')
