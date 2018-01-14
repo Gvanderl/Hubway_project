@@ -8,11 +8,10 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='get_hubway_data',  # Required
-    version='0.1',  # Required
-    description='Extract data from Hubway CSVs',  # Required
-    long_description=long_description,  # Optional
-    url='https://github.com/Gvanderl/Neurala',  # Optional
+    name='get_hubway_data',
+    version='1.0',
+    description='Extract data from Hubway CSVs',
+    long_description=long_description,
     py_modules=["get_hubway_data"],
     install_requires=['matplotlib', 'pandas']
 )
