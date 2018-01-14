@@ -5,11 +5,11 @@ import json
 import sys
 
 local_path, output_dir = None, None
-for index, word in sys.argv.split():
+for index, word in sys.argv:
     if word == "--input":
-        local_path = sys.argv.split[index + 1]
+        local_path = sys.argv[index + 1]
     if word == "--output":
-        output_dir = sys.argv.split[index + 1]
+        output_dir = sys.argv[index + 1]
 
 # These have been constant through all of Hubway"s CSVs (the column headers are not)
 DURATION_COLUMN = 0
@@ -48,7 +48,7 @@ while True:
 
 # Get the output directory
 while True:
-    if not output_dir is None
+    if not output_dir is None:
         output_dir = input("Output directory : ")
     if not os.path.isdir(output_dir):
         print("This is not a valid output directory")
