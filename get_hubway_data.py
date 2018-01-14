@@ -2,6 +2,10 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import json
+import sys
+
+for word in sys.argv:
+    print(word)
 
 # These have been constant through all of Hubway"s CSVs (the column headers are not)
 DURATION_COLUMN = 0
@@ -16,7 +20,7 @@ def is_ms(start_date, end_date, duration):
     Checks if the duration given between the two dates corresponds more closely to milliseconds than seconds
     :param start_date: datetime object corresponding to the start date
     :param end_date: datetime object corresponding to the end date
-    :param duration: Duration given in the data set between the start_date and end_date
+    :param duration: Duration given in the data set between start_date and end_date
     :return: True if time is in milliseconds, False otherwise
     """
     percent_error_for_conversion = .8
@@ -26,7 +30,7 @@ def is_ms(start_date, end_date, duration):
 
 # Get the input file
 while True:
-    local_path = "201705-hubway-tripdata.csv"  # input("Path of the csv : ")
+    local_path = input("Path of the csv : ")
     if not local_path.endswith(".csv"):
         local_path += ".csv"
     try:
@@ -39,7 +43,7 @@ while True:
 
 # Get the output directory
 while True:
-    output_dir = "output"  # input("Output directory : ")
+    output_dir = input("Output directory : ")
     if not os.path.isdir(output_dir):
         print("This is not a valid output directory")
         continue
@@ -66,7 +70,6 @@ data = {"Earliest date": str(df.iloc[:, START_DATE_COLUMN].min()),
 data["Average duration for the most common trip (sec)"] = \
     (df.where((df["start station name"] == data["Station most traveled from"]) &
               (df["end station name"] == data["Station most traveled to"]))).iloc[:, DURATION_COLUMN].mean()
-
 
 # Creates the histogram
 ax = plt.subplot(111)
