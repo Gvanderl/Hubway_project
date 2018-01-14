@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='get_hubway_data',
-    version='1.0',
+    version='1.1',
     description='Extract data from Hubway CSVs',
     long_description=long_description,
     py_modules=["get_hubway_data"],
