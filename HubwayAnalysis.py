@@ -26,7 +26,7 @@ def is_ms(start_date, end_date, duration):
 
 # Get the input file
 while True:
-    local_path = "data"  # input("Path of the csv : ")
+    local_path = "201705-hubway-tripdata.csv"  # input("Path of the csv : ")
     if not local_path.endswith(".csv"):
         local_path += ".csv"
     try:
@@ -54,7 +54,8 @@ if is_ms(df.iloc[0, START_DATE_COLUMN], df.iloc[0, END_DATE_COLUMN], df.iloc[0, 
     df.iloc[:, DURATION_COLUMN] = df.iloc[:, DURATION_COLUMN].apply(lambda x: float(x)/1000)
 # Some data sets have a letter at the start of the the bike ID, it is deleted
 if str(df.iloc[0, BIKE_ID_COLUMN])[0].isalpha():
-    df.iloc[:, BIKE_ID_COLUMN] = df.iloc[:, BIKE_ID_COLUMN].apply(lambda x: x[1:])
+    df.iloc[:, BIKE_ID_COLUMN] = df.iloc[:, BIKE_ID_COLUMN].apply(lambda x: int(x[1:]) if str(x[1:]).isdigit() else None)
+df = df.dropna()
 
 # Extract the relevant data (Note: Duration data heavily right-skewed, might be better to use the median)
 data = {"Earliest date": str(df.iloc[:, START_DATE_COLUMN].min()),
@@ -66,19 +67,23 @@ data["Average duration for the most common trip (sec)"] = \
     (df.where((df["start station name"] == data["Station most traveled from"]) &
               (df["end station name"] == data["Station most traveled to"]))).iloc[:, DURATION_COLUMN].mean()
 
+
 # Creates the histogram
+ax = plt.subplot(111)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+plt.grid(color="gray",
+         alpha=.2)
 plt.hist(df.iloc[:, BIKE_ID_COLUMN],
          alpha=1,
          color="royalblue",
-         bins=20)
+         bins='auto')
 plt.rc('axes', axisbelow=True)
-plt.grid(color="gray",
-         alpha=.2)
 plt.ylabel("Frequency")
 plt.xlabel("Bike ID")
 
 # Exports everything to output directory
-file_name = local_path.replace(".csv", "") + ".json"  # Creates custom file name based on the CSV
+file_name = local_path.replace(".csv", "") + "_extracted_data.json"  # Creates custom file name based on the CSV
 with open(output_dir + "/" + file_name, 'w') as outfile:
     json.dump(data, outfile)
-plt.savefig(output_dir + "/" + file_name.replace("data.json", "bike_ID_histogram.png"))
+plt.savefig(output_dir + "/" + file_name.replace("extracted_data.json", "bike_ID_histogram.png"), bbox_inches="tight")
