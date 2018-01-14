@@ -4,8 +4,12 @@ import matplotlib.pyplot as plt
 import json
 import sys
 
-for word in sys.argv:
-    print(word)
+local_path, output_dir = None, None
+for index, word in sys.argv.split():
+    if word == "--input":
+        local_path = sys.argv.split[index + 1]
+    if word == "--output":
+        output_dir = sys.argv.split[index + 1]
 
 # These have been constant through all of Hubway"s CSVs (the column headers are not)
 DURATION_COLUMN = 0
@@ -30,7 +34,8 @@ def is_ms(start_date, end_date, duration):
 
 # Get the input file
 while True:
-    local_path = input("Path of the csv : ")
+    if not local_path is None:
+        local_path = input("Path of the csv : ")
     if not local_path.endswith(".csv"):
         local_path += ".csv"
     try:
@@ -43,7 +48,8 @@ while True:
 
 # Get the output directory
 while True:
-    output_dir = input("Output directory : ")
+    if not output_dir is None
+        output_dir = input("Output directory : ")
     if not os.path.isdir(output_dir):
         print("This is not a valid output directory")
         continue
