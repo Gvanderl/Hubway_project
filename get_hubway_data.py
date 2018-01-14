@@ -34,7 +34,7 @@ def is_ms(start_date, end_date, duration):
 
 # Get the input file
 while True:
-    if not local_path is None:
+    if local_path is None:
         local_path = input("Path of the csv : ")
     if not local_path.endswith(".csv"):
         local_path += ".csv"
@@ -42,16 +42,18 @@ while True:
         df = pd.read_csv(local_path, parse_dates=[START_DATE_COLUMN, END_DATE_COLUMN], infer_datetime_format=True)
     except FileNotFoundError:
         print("Couldn't find file : {}".format(local_path))
+        local_path = None
         continue
     else:
         break
 
 # Get the output directory
 while True:
-    if not output_dir is None:
+    if output_dir is None:
         output_dir = input("Output directory : ")
     if not os.path.isdir(output_dir):
         print("This is not a valid output directory")
+        local_path = None
         continue
     break
 
