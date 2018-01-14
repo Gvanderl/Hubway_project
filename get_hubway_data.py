@@ -40,7 +40,8 @@ while True:
     if not local_path.endswith(".csv"):
         local_path += ".csv"
     try:
-        df = pd.read_csv(local_path, parse_dates=[START_DATE_COLUMN, END_DATE_COLUMN], infer_datetime_format=True)
+        df = pd.read_csv(local_path, parse_dates=[START_DATE_COLUMN, END_DATE_COLUMN],
+                         infer_datetime_format=True, low_memory=False)
     except FileNotFoundError:
         print("Couldn't find file : {}".format(local_path))
         local_path = None
