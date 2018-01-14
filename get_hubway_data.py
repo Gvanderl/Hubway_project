@@ -5,7 +5,7 @@ import json
 import sys
 
 local_path, output_dir = None, None
-for index, word in sys.argv:
+for index, word in enumerate(sys.argv):
     if word == "--input":
         local_path = sys.argv[index + 1]
     if word == "--output":
